@@ -8,6 +8,6 @@ Reviewable research brief for an internal security-awareness session on **Log4Sh
 - **RR-102** — Which Apache Log4j versions are vulnerable and which release fixed it.
 - **RR-103** — One concrete real-world impact or deployment lesson from the incident.
 
-Every element of this brief is a reviewable commit in `research/discovers`, rather than a loose document. Source and relevance for logging deployments are in the commit at the top of that.
+Every element of this brief is a reviewable commit in `research/log4shell`, rather than a loose document. Source and relevance for logging deployments are in the commit at the top of that.
 
-> See the linked in the end of this README.
+> See the linked open **Pull Request #1** (https://github.com/for-toolathlon/log4shell-research-brief/pull/1).
