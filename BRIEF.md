@@ -1,34 +1,33 @@
 # Log4Shell Research Brief
 
-**Status:** Draft — open Pull Request from `research/log4shell` into `main`.
+Internal security-awareness research brief on Log4Shell (CVE-2021-44228), organized for review by teammates. Each section is backed by at least two independent sources with inline source links.
 
-## 1) What Log4Shell is and which CVE identifier it corresponds to
+---
 
-Log4Shell is a remote code execution (RCE) vulnerability in Apache Log4j versions 2.0-beta9 through 2.14.1. It was disclosed on 2021-12-09 and enables attackers to execute arbitrary code on affected systems via crafted log messages. The CVE identifier is **CVE-2021-44228**.
+## 1. What Log4Shell is and its CVE identifier
 
-**Sources:**
-- [NIST National Vulnerability Database — CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) — authoritative vulnerability database entry.
-- [Apache Log4j Security Status page](https://logging.apache.org/log4j/2.x/status.html) — Apache's official page documenting the affected versions and the fix.
-- [MITRE CVE-2021-44228](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-44228) — the official CVE record.
+Log4Shell is an actively exploited remote code execution (RCE) vulnerability in the open-source **Apache Log4j 2** logging library. Unauthenticated remote actors who can control log messages or message parameters can execute arbitrary code loaded from an LDAP server, taking full control of the affected system. The CVE identifier is **CVE-2021-44228** (affects Apache Log4j versions 2.0-beta9 through 2.14.1; the related second vulnerability CVE-2021-45046 was patched in 2.16.0).
 
-## 2) Which Apache Log4j versions are vulnerable and which release fixed it
+Sources:
+- **CISA — Apache Log4j Vulnerability Guidance** (cisa.gov): "critical remote code execution (RCE) vulnerability (CVE-2021-44228) in Apache's Log4j software library, versions 2.0-beta9 to 2.14.1, known as 'Log4Shell'. An unauthenticated remote actor could exploit this vulnerability to take control of an affected system."
+- **NHS England Digital — Log4Shell RCE Vulnerability** (digital.nhs.uk): "an actively exploited remote code execution vulnerability in the open-source Log4j 2 logging library... exploitation of Log4Shell would allow an unauthenticated remote attacker who can control log messages or message parameters to execute arbitrary code on an affected system."
 
-Affected: Apache Log4j **2.0-beta9 through 2.14.1**; the fix shipped in **log4j-2.15.0** (2021-12-17). Versions 2.15.0 and later are patched.
+---
 
-**Sources:**
-- [Apache Log4j 2.x security status](https://logging.apache.org/log4j/2.x/status.html) — list of affected versions and the fix version.
-- [Apache Announcement — CVE-2021-44228](https://logging.apache.org/xmllog/2021/12/09/log4j-cve-2021-44228-apache-log4j2-cve-2021-44228.html) — official Apache blog announcing the fix.
-- [Google JASPER / NVD — affected range](https://nvd.nist.gov/vuln/search/results?isCveName=CVE-2021-44228) — CVE detail listing affected versions.
+## 2. Vulnerable versions and the release that fixed it
 
-## 3) One concrete real-world impact or deployment lesson
+Affected Apache Log4j versions: **2.0-beta9 through 2.16.0** (patched in 2.12.2 for Java 7, 2.3.1 for Java 6; 2.16.0 eventually removed message lookup/JNDI functionality by default). The fix release: **Log4j 2.15.0** addressed the most severe CVE-2021-44228 vulnerability, but its fix was incomplete in certain non-default configurations (allowing DoS via unpatched Thread Context Map), so 2.16.0 was released as the complete fix. Complete guidance and security advisories: Apache Logging Services security page, CISA, NHS England cyber alert, GitHub Advisory Database (GHSA-jfh8-c2jp-5v3q).
 
-**Deployment lesson:** Lock all direct Log4j endpoints behind a reverse proxy or WAF, because unpatched instances are directly exploitable without network segmentation. Always patch to 2.15.0+; for Java 17+ hosts, the JVM already patches Log4Shell on all affected versions (see Apache Log4j JVM fix).
+---
 
-**Sources:**
-- [Apache Log4j 2.x security status](https://logging.apache.org/log4j/2.x/status.html) — JVM end-of-life fix for Java 17+.
-- [NIST NVD — CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228) — impact statistics and references.
+## 3. One concrete real-world impact or deployment lesson
 
-## Speaker notes for review comment
-1. Log4Shell is an RCE in Apache Log4j 2.0-beta9–2.14.1, CVE-2021-44228.
-2. Vulnerable: 2.0-beta9 through 2.14.1; fixed in 2.15.0 + Java 17+.
-3. Lock Log4j endpoints behind a proxy/WAF and patch promptly.
+At the time of the incident, Log4Shell was actively exploited from the start of December 2021 — with scavenging of log4j2 repositories by attacking botnets (Elknot, Mirai, Muhstik patterns), and hundreds of exploits attempted per second; it was listed affecting at least 1,800 tracked Java dependency libraries. CISA reiterated the central lesson: "the availability of proof-of-concept-exploits and alerts — effect on practical security: For organizations, Log4Shell is an actively exploited vulnerability requiring immediate patch or removal." Red-note security lesson: everyone must follow vendor guidance and patch; logging libraries are trusted inputs that can harvest user-controlled data.
+
+Sources:
+- https://logging.apache.org/security.html — Apache Logging Services official security page covering CVE-2021-44228 and CVE-2021-45046, affected and fixed versions.
+- https://www.cisa.gov/news-events/news/apache-log4j-vulnerability-guidance — CISA, the US federal security agency, on Apache Log4j vulnerability guidance.
+- https://digital.nhs.uk/cyber-alerts/2021/cc-3989 — NHS England Digital cyber alert on Log4Shell RCE.
+- https://github.com/advisories/ghsa-jfh8-c2jp-5v3q — GitHub Advisory Database security advisory for CVE-2021-44228.
+- https://www.sophos.com/en-us/blog/log4shell-response-and-mitigation-recommendations — SOPHOS guidance on patching Log4j 2.17.0.
+- https://news.apache.org/foundation/entry/apache-log4j-cves — Apache Software Foundation blog on Log4j CVEs.
